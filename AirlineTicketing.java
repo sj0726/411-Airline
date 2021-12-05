@@ -85,7 +85,7 @@ public class AirlineTicketing {
                 return p;
             }
         }
-        System.out.println("No matching plane found! Please try again.");
+        System.out.println("No matching plane going to " + dest + " on " + date + "! Please try again.");
         Planes dummy = new Planes(0, "invalid", this.dateFormat("00:00 Jan 1 0000"));
         return dummy;
     }
@@ -96,14 +96,23 @@ public class AirlineTicketing {
             return;
         }
         else {
-            p.addSeat();
+            if (p.addSeat()) {
+                System.out.println("Successfully booked a seat on plane " + p.planeNum + " going to " + dest + " at " + date);
+            }
         }
     }
 
     public void changeSeat(String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
         Planes originPlane = this.searchPlane(dest, originDate);
-        originPlane.removeSeat();
-        this.bookSeat(dest, newDate);
+        Planes newPlane = this.searchPlane(dest, newDate);
+        if (newPlane.dest == "invalid") {
+            return;
+        }
+        else {
+            if (originPlane.removeSeat()) {
+                this.bookSeat(dest, newDate);
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -122,7 +131,7 @@ public class AirlineTicketing {
         a.bookSeat("New York", "12:30 Apr 1 2022");
         System.out.println(a.getPlanes());
 
-        // a.getPlanes().get(2).current = 50;
-        // a.bookSeat("Boston", "12:30 Apr 1 2022");
+        a.getPlanes().get(2).current = 50;
+        a.bookSeat("Boston", "12:30 Apr 1 2022");
     }
 }

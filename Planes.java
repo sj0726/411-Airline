@@ -1,7 +1,5 @@
 import java.util.*;
 
-import javax.management.RuntimeErrorException;
-
 // class for individual planes
 
 public class Planes {
@@ -28,25 +26,27 @@ public class Planes {
         return s;
     }
 
-    public void addSeat() {
+    public boolean addSeat() {
         if (this.current < this.maxSeats) {
             this.seats[this.current] = true;
             this.current++;
+            return true;
         }
         else {
-            // System.out.println("The plane is fully booked!");
-            throw new java.lang.Error("The plane is fully booked!"); // perhaps exception might be better for try-catching
+            System.out.println("The plane is fully booked! Please try again.");
+            return false;
         }
     }
 
-    public void removeSeat() {
+    public boolean removeSeat() {
         if (this.current > 0) {
             this.current--;
             this.seats[this.current] = false;
+            return true;
         }
         else {
-            // System.out.println("The plane is already empty!");
-            throw new java.lang.Error("The plane is already empty!");
+            System.out.println("The plane is already empty! Please try again.");
+            return false;
         }
     }
 }
