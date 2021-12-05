@@ -1,9 +1,13 @@
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+// class for individual planes
 
 public class Planes {
     public static int number = 0;
     int planeNum;
     int maxSeats;
+    int current;
     boolean[] seats;
     String dest;
     Date date;
@@ -13,6 +17,7 @@ public class Planes {
         this.planeNum = Planes.number;
         this.maxSeats = maxSeats;
         this.seats = new boolean[maxSeats];
+        this.current = 0;
         this.dest = dest;
         this.date = date;
     }
@@ -20,5 +25,15 @@ public class Planes {
     public String toString() {
         String s = String.format("Plane #%d\n----------\nDestination: %s\nDate/Time: %s\nPassenger Cap.: %d\n", this.planeNum, this.dest, this.date, this.maxSeats);
         return s;
+    }
+
+    public void addSeat() {
+        this.seats[this.current] = true;
+        this.current++;
+    }
+
+    public void removeSeat() {
+        this.current--;
+        this.seats[this.current] = false;
     }
 }
