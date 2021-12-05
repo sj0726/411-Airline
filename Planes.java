@@ -1,4 +1,3 @@
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 // class for individual planes
@@ -28,12 +27,22 @@ public class Planes {
     }
 
     public void addSeat() {
-        this.seats[this.current] = true;
-        this.current++;
+        if (this.current < this.maxSeats) {
+            this.seats[this.current] = true;
+            this.current++;
+        }
+        else {
+            System.out.println("The plane is fully booked!");
+        }
     }
 
     public void removeSeat() {
-        this.current--;
-        this.seats[this.current] = false;
+        if (this.current > 0) {
+            this.current--;
+            this.seats[this.current] = false;
+        }
+        else {
+            System.out.println("The plane is already empty!");
+        }
     }
 }
