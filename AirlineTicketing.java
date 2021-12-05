@@ -101,9 +101,9 @@ public class AirlineTicketing {
     }
 
     public void changeSeat(String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
-        Date oDate = this.dateFormat(originDate);
-        Date nDate = this.dateFormat(newDate);
-        // TODO
+        Planes originPlane = this.searchPlane(dest, originDate);
+        originPlane.removeSeat();
+        this.bookSeat(dest, newDate);
     }
 
     public static void main(String[] args) {
@@ -121,5 +121,8 @@ public class AirlineTicketing {
         System.out.println(a.getPlanes());
         a.bookSeat("New York", "12:30 Apr 1 2022");
         System.out.println(a.getPlanes());
+
+        // a.getPlanes().get(2).current = 50;
+        // a.bookSeat("Boston", "12:30 Apr 1 2022");
     }
 }
