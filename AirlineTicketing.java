@@ -133,5 +133,9 @@ public class AirlineTicketing {
 
         a.getPlanes().get(2).current = 50;
         a.bookSeat("Boston", "12:30 Apr 1 2022");
+
+        System.out.println(a.getPlanes().get(0).planeNum);
+        System.out.println(a.getPlanes().get(1).planeNum);
+        System.out.println(a.getPlanes().get(2).planeNum);
     }
 }
