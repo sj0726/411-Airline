@@ -93,7 +93,7 @@ public class User
 
     }
     public static void menu(){
-        if(loggedIn){//-------------------Login Page------------------------
+        if(loggedIn){//-------------------Page when logged in------------------------
             System.out.println("test" );
         }
     }
