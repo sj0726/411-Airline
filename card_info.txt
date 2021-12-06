@@ -1,3 +1,4 @@
 Name, Num, Exp Date, secCode
 test Card, 1234567890, 10/21, 1234
 test card, 0198309382103, 12/21, 1332
+idk, 1, 2022, 123

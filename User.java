@@ -1,4 +1,6 @@
 import java.io.*;
+import java.sql.PseudoColumnUsage;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 public class User
@@ -94,7 +96,42 @@ public class User
     }
     public static void menu(){
         if(loggedIn){//-------------------Page when logged in------------------------
-            System.out.println("test" );
+            Scanner s = new Scanner(System.in);
+            System.out.println("How can we help today?");
+            while(true) {
+                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
+                String choice = s.nextLine();
+                if (choice.equals("Book")) {
+                    break;
+                }
+                else if (choice.equals("Change")) {
+                    break;
+                }
+                else {
+                    System.out.printf("Invalid input. (%s) Please try again.\n", choice);
+                }
+            }
+            // start ticketing process.. but must differentiate per airport? or nah
+            AirlineTicketing ticketing = new AirlineTicketing();
+            ArrayList<Planes> planeSchedule = ticketing.getPlanes();
+            Planes p;
+            while (true) {
+                System.out.println("Please choose from the following planes:");
+                for (int i = 0; i < planeSchedule.size(); i++) {
+                    System.out.println(planeSchedule.get(i));
+                }
+                System.out.print("Plane #?: ");
+                int planeNum = Integer.parseInt(s.nextLine()) - 1;
+                p = planeSchedule.get(planeNum);
+                System.out.print("\nSelected plane\n====================\nDestination: " + p.dest + "\nTime/Date: " + p.date + "\n====================\n\nPlease confirm the above is correct (y/n): ");
+                if (s.nextLine().equals("y")) {
+                    break;
+                }
+                else {
+                    continue;
+                }
+            }
+            ticketing.bookSeat(p.dest, p.date);
         }
     }
 

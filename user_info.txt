@@ -14,3 +14,11 @@ testUser
 Password: 
 passTest
 Active account:true
+---------------------User--------------------- 
+Name: 
+Nick
+Username: 
+sj0726
+Password: 
+1234
+Active account:true

@@ -77,11 +77,10 @@ public class AirlineTicketing {
         this.writePlane("planes.txt", maxSeats, dest, date);
     }
 
-    public Planes searchPlane(String dest, String date) {
-        Date d = this.dateFormat(date);
+    public Planes searchPlane(String dest, Date date) {
         for (int i = 0; i < this.allPlanes.size(); i++) {
             Planes p = this.allPlanes.get(i);
-            if (p.date.compareTo(d) == 0 && p.dest.equals(dest)) { // found a matching plane
+            if (p.date.compareTo(date) == 0 && p.dest.equals(dest)) { // found a matching plane
                 return p;
             }
         }
@@ -91,20 +90,32 @@ public class AirlineTicketing {
     }
 
     public void bookSeat(String dest, String date) {
+        Planes p = this.searchPlane(dest, this.dateFormat(date));
+        if (p.dest == "invalid") {
+            return;
+        }
+        else {
+            if (p.addSeat()) {
+                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going to " + dest + " at " + date);
+            }
+        }
+    }
+
+    public void bookSeat(String dest, Date date) {
         Planes p = this.searchPlane(dest, date);
         if (p.dest == "invalid") {
             return;
         }
         else {
             if (p.addSeat()) {
-                System.out.println("Successfully booked a seat on plane " + p.planeNum + " going to " + dest + " at " + date);
+                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going to " + dest + " at " + date);
             }
         }
     }
 
     public void changeSeat(String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
-        Planes originPlane = this.searchPlane(dest, originDate);
-        Planes newPlane = this.searchPlane(dest, newDate);
+        Planes originPlane = this.searchPlane(dest, this.dateFormat(originDate));
+        Planes newPlane = this.searchPlane(dest, this.dateFormat(newDate));
         if (newPlane.dest == "invalid") {
             return;
         }
