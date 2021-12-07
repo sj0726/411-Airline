@@ -1,14 +1,45 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
+
 public class User
 {
     private static boolean loggedIn;
-    private static String name;
+    public ArrayList<UserAccount> accounts = new ArrayList<>();
+
+    public User() {
+        this.readUsers();
+        this.accounts = new ArrayList<UserAccount>();
+    }
+
+    private void readUsers() throws IllegalArgumentException{
+        String result = "";
+        String file = "user_info.txt";
+        try {
+            File p = new File(file);
+            Scanner fileReader = new Scanner(p);
+            while (fileReader.hasNextLine()) {
+                result += fileReader.nextLine();
+                if (fileReader.hasNextLine()) {
+                    result += "\n";
+                }
+            }
+            fileReader.close();
+        } catch (Exception e) {
+            System.out.println("File not found");
+            throw new IllegalArgumentException(e);
+        }
+        String[] users = result.split("\n");
+        System.out.println(Arrays.toString(users));
+    }
 
 
 
     public static void main(String[] args) throws IOException {
+        User user = new User();
+
 
         Scanner input = new Scanner (System.in);
         Scanner input2 = new Scanner(System.in);
@@ -17,13 +48,14 @@ public class User
         String password;
         String choice;
 
+
         boolean wants_to_register = false;
 
 
         System.out.println("Welcome to New England Express Airlines!");
         System.out.println("Login or Register?(type 'Login' or 'Register):\n");
         choice = input.nextLine();
-        if(Objects.equals(choice, "Login")) {
+        if(choice.equalsIgnoreCase( "Login")) {
 
             System.out.println("\nEnter your username and password to login to your account.");
             System.out.println("Username: ");
@@ -43,14 +75,14 @@ public class User
             if(valid&& password.length()>1){
                 loggedIn = true;
 
-                System.out.println("Logged in. Welcome, " + name + "!" );
+                System.out.println("Logged in. Welcome, " + username + "!" );
                 menu();
 
 
             }else {
                 System.out.println("This account information is not on file. Do you want to create an account? (Type Yes/No)");
                 String create_acc = input2.nextLine();
-                if(Objects.equals(create_acc, "Yes")){
+                if(create_acc.equalsIgnoreCase("Yes")){
                     wants_to_register = true;
 
                 }else {
@@ -58,11 +90,11 @@ public class User
                 }
             }
         }
-        if(Objects.equals(choice, "Register")||wants_to_register) {
+        if(choice.equalsIgnoreCase("Register")||wants_to_register) {
             //---------------------------------Registration-----------------------------------------------
             System.out.println("Create an account so you can book your ticket with us!");
             System.out.println("Name: ");
-            name= input.nextLine();
+            String name = input.nextLine();
             System.out.println("User: ");
             username = input.nextLine();
             System.out.println("Password:");
@@ -80,27 +112,76 @@ public class User
             String secCode = input.nextLine();
             CardInfo user_card = new CardInfo(cardName,cardNum,expDate,secCode);
             user_card.storeCard();
-            UserAccount new_user = new UserAccount(name,username,password,user_card);
-            new_user.storeUser();
+            user.accounts.add(user.addUser(name,username,password,user_card));
+
+            loggedIn = true;
+            menu();
+
         }
 
-
-
-
-
-
-
-
     }
+
+    private UserAccount addUser(String name, String username, String password, CardInfo user_card) {
+            UserAccount new_user = new UserAccount(name,username,password,user_card);
+            this.accounts.add(new_user);
+            return new_user;
+    }
+
     public static void menu(){
+
+
         if(loggedIn){//-------------------Page when logged in------------------------
-            System.out.println("test" );
+            Scanner s = new Scanner(System.in);
+            AirlineTicketing airlineTicketing = new AirlineTicketing();
+            System.out.println("How can we help today?");
+            while(true) {
+                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
+                String choice = s.nextLine();
+                if (choice.equalsIgnoreCase("Book") ){
+                    break;
+
+                }
+                else if (choice.equalsIgnoreCase("Change")) {
+                    break;
+                }
+                else {
+                    System.out.printf("Invalid input. (%s) Please try again.\n", choice);
+                }
+            }
+            // start ticketing process but must differentiate per airport? or nah
+            AirlineTicketing ticketing = new AirlineTicketing();
+            ArrayList<Planes> planeSchedule = ticketing.getPlanes();
+
+            Planes p;
+            while (true) {
+                System.out.println("Please choose from the following planes:");
+                for (int i = 0; i < planeSchedule.size(); i++) {
+                    System.out.println(planeSchedule.get(i));
+                }
+                System.out.print("Plane #?: ");
+                int planeNum = Integer.parseInt(s.nextLine()) - 1;
+                p = planeSchedule.get(planeNum);
+                System.out.print("\nSelected plane\n====================\nDestination: " + p.dest + "\nTime/Date: " + p.date + "\n====================\n\nPlease confirm the above is correct (y/n): ");
+                if (s.nextLine().equals("y")) {
+                    break;
+                }
+                else {
+                    continue;
+                }
+            }
+            ticketing.bookSeat(p.dest, p.date);
+
+
+
+
         }
     }
 
 
 
 }
+
+
 class UserAccount
 {
 
@@ -109,34 +190,47 @@ class UserAccount
     private final CardInfo cardInfo;
     private final String name;
     private boolean active;
+    private ArrayList<Planes> user_planes = new ArrayList<>();
 
 
     public UserAccount(String name, String username, String password,CardInfo card) {
+        ArrayList<Planes> user_flights =  new ArrayList<>();
         this.name = name;
         this.username = username;
         this.password = password;
         this.cardInfo = card;
         this.active = true;
+        this.user_planes = user_flights;
 
     }
-    public void storeUser() throws IOException{
+
+    public void addUser_planes(Planes p){
+        this.user_planes.add(p);
+    }
+
+    public ArrayList<Planes> printUserPlanes( ){
+        return this.user_planes;
+
+    }
+
+
+
+    public static void storeUser(UserAccount user) throws IOException{
         FileWriter fw = null;
         BufferedWriter bw = null;
         PrintWriter pw = null;
+
 
         try {
             fw = new FileWriter("user_info.txt", true);
             bw = new BufferedWriter(fw);
             pw = new PrintWriter(bw);
             pw.println("---------------------User--------------------- ");
-            pw.println("Name: ");
-            pw.println(this.name);
-            pw.println("Username: ");
-            pw.println(this.username);
-            pw.println("Password: ");
-            pw.println(this.password);
-
-            pw.println("Active account:" + this.active);
+            pw.println("Name: "+user.name);
+            pw.println("Username: "+user.username);
+            pw.println("Password: "+ user.password);
+            pw.println("Active account:" + user.active);
+            pw.println("User planes:" +user.user_planes.toString());
             pw.flush();
         }finally {
             try {
