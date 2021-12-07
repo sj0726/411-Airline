@@ -50,7 +50,7 @@ public class AirlineTicketing {
             throw new IllegalArgumentException(e);
         }
     }
-
+  
     private void writePlane(String file, int maxSeats, String origin, String dest, String date) throws IllegalArgumentException { // writes down the inputted plane value to a text file (only accesible via addPlanes() method)
         try {
             FileWriter fr = new FileWriter(file, true);
