@@ -35,7 +35,57 @@ public class User
         System.out.println(Arrays.toString(users));
     }
 
+    private void addUser(String name, String username, String password, CardInfo user_card) {
+            UserAccount new_user = new UserAccount(name,username,password,user_card);
+            this.accounts.add(new_user);
+    }
 
+    public static void menu(){
+        if(loggedIn){//-------------------Page when logged in------------------------
+            Scanner s = new Scanner(System.in);
+            System.out.println("How can we help today?");
+            String choice;
+            while(true) {
+                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
+                choice = s.nextLine();
+                if (choice.equals("Book")) {
+                    break;
+                }
+                else if (choice.equals("Change")) {
+                    break;
+                }
+                else {
+                    System.out.printf("Invalid input. (%s) Please try again.\n", choice);
+                }
+            }
+            // start ticketing process.. but must differentiate per airport? or nah
+            AirlineTicketing ticketing = new AirlineTicketing();
+            ArrayList<Planes> planeSchedule = ticketing.getPlanes();
+            Planes p;
+            if (choice.equals("Book")) {
+                while (true) {
+                    System.out.println("Please choose from the following planes:");
+                    for (int i = 0; i < planeSchedule.size(); i++) {
+                        System.out.println(planeSchedule.get(i));
+                    }
+                    System.out.print("Plane #?: ");
+                    int planeNum = Integer.parseInt(s.nextLine()) - 1;
+                    p = planeSchedule.get(planeNum);
+                    System.out.print("\nSelected plane\n====================\n" + p + "====================\n\nPlease confirm the above is correct (y/n): ");
+                    if (s.nextLine().equals("y")) {
+                        ticketing.bookSeat(p.origin, p.dest, p.date);
+                        break;
+                    }
+                    else {
+                        continue;
+                    }
+                }
+            }
+            else { // seat change
+
+            }
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         User user = new User();
@@ -112,7 +162,7 @@ public class User
             String secCode = input.nextLine();
             CardInfo user_card = new CardInfo(cardName,cardNum,expDate,secCode);
             user_card.storeCard();
-            user.accounts.add(user.addUser(name,username,password,user_card));
+            user.addUser(name,username,password,user_card);
 
             loggedIn = true;
             menu();
@@ -120,61 +170,6 @@ public class User
         }
 
     }
-
-    private UserAccount addUser(String name, String username, String password, CardInfo user_card) {
-            UserAccount new_user = new UserAccount(name,username,password,user_card);
-            this.accounts.add(new_user);
-            return new_user;
-    }
-
-    public static void menu(){
-        if(loggedIn){//-------------------Page when logged in------------------------
-            Scanner s = new Scanner(System.in);
-            System.out.println("How can we help today?");
-            String choice;
-            while(true) {
-                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
-                choice = s.nextLine();
-                if (choice.equals("Book")) {
-                    break;
-                }
-                else if (choice.equals("Change")) {
-                    break;
-                }
-                else {
-                    System.out.printf("Invalid input. (%s) Please try again.\n", choice);
-                }
-            }
-            // start ticketing process.. but must differentiate per airport? or nah
-            AirlineTicketing ticketing = new AirlineTicketing();
-            ArrayList<Planes> planeSchedule = ticketing.getPlanes();
-            Planes p;
-            if (choice.equals("Book")) {
-                while (true) {
-                    System.out.println("Please choose from the following planes:");
-                    for (int i = 0; i < planeSchedule.size(); i++) {
-                        System.out.println(planeSchedule.get(i));
-                    }
-                    System.out.print("Plane #?: ");
-                    int planeNum = Integer.parseInt(s.nextLine()) - 1;
-                    p = planeSchedule.get(planeNum);
-                    System.out.print("\nSelected plane\n====================\n" + p + "====================\n\nPlease confirm the above is correct (y/n): ");
-                    if (s.nextLine().equals("y")) {
-                        ticketing.bookSeat(p.origin, p.dest, p.date);
-                        break;
-                    }
-                    else {
-                        continue;
-                    }
-                }
-            }
-            else { // seat change
-
-            }
-        }
-    }
-
-
 
 }
 
