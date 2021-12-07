@@ -98,9 +98,10 @@ public class User
         if(loggedIn){//-------------------Page when logged in------------------------
             Scanner s = new Scanner(System.in);
             System.out.println("How can we help today?");
+            String choice;
             while(true) {
                 System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
-                String choice = s.nextLine();
+                choice = s.nextLine();
                 if (choice.equals("Book")) {
                     break;
                 }
@@ -115,23 +116,28 @@ public class User
             AirlineTicketing ticketing = new AirlineTicketing();
             ArrayList<Planes> planeSchedule = ticketing.getPlanes();
             Planes p;
-            while (true) {
-                System.out.println("Please choose from the following planes:");
-                for (int i = 0; i < planeSchedule.size(); i++) {
-                    System.out.println(planeSchedule.get(i));
-                }
-                System.out.print("Plane #?: ");
-                int planeNum = Integer.parseInt(s.nextLine()) - 1;
-                p = planeSchedule.get(planeNum);
-                System.out.print("\nSelected plane\n====================\nDestination: " + p.dest + "\nTime/Date: " + p.date + "\n====================\n\nPlease confirm the above is correct (y/n): ");
-                if (s.nextLine().equals("y")) {
-                    break;
-                }
-                else {
-                    continue;
+            if (choice.equals("Book")) {
+                while (true) {
+                    System.out.println("Please choose from the following planes:");
+                    for (int i = 0; i < planeSchedule.size(); i++) {
+                        System.out.println(planeSchedule.get(i));
+                    }
+                    System.out.print("Plane #?: ");
+                    int planeNum = Integer.parseInt(s.nextLine()) - 1;
+                    p = planeSchedule.get(planeNum);
+                    System.out.print("\nSelected plane\n====================\n" + p + "====================\n\nPlease confirm the above is correct (y/n): ");
+                    if (s.nextLine().equals("y")) {
+                        ticketing.bookSeat(p.origin, p.dest, p.date);
+                        break;
+                    }
+                    else {
+                        continue;
+                    }
                 }
             }
-            ticketing.bookSeat(p.dest, p.date);
+            else { // seat change
+
+            }
         }
     }
 

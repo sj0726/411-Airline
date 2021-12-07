@@ -8,21 +8,23 @@ public class Planes {
     int maxSeats;
     int current;
     boolean[] seats;
+    String origin;
     String dest;
     Date date;
 
-    public Planes(int maxSeats, String dest, Date date) {
+    public Planes(int maxSeats, String origin, String dest, Date date) {
         Planes.number++;
         this.planeNum = Planes.number;
         this.maxSeats = maxSeats;
         this.seats = new boolean[maxSeats];
         this.current = 0;
+        this.origin = origin;
         this.dest = dest;
         this.date = date;
     }
 
     public String toString() {
-        String s = String.format("Plane #%d\n----------\nDestination: %s\nDate/Time: %s\nPassenger Cap.: %d\n", this.planeNum, this.dest, this.date, this.maxSeats);
+        String s = String.format("Plane #%d\n----------\nOrigin: %s\nDestination: %s\nDate/Time: %s\nPassenger Cap.: %d\n", this.planeNum, this.origin, this.dest, this.date, this.maxSeats);
         return s;
     }
 

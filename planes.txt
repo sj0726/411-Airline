@@ -1,3 +1,4 @@
-15:30 Jul 23 2000/50/Providence
-14:15 Mar 15 2021/100/Concord
-12:30 Apr 1 2022/50/Boston
+15:30 Jul 23 2000/50/Portland/Providence
+14:15 Mar 15 2021/100/Providence/Concord
+12:30 Apr 1 2022/50/Concord/Boston
+01:30 Apr 3 2022/50/Boston/New York
