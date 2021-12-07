@@ -34,7 +34,7 @@ public class AirlineTicketing {
             String d = planes[i];
             String[] details = d.split("/");
             date = this.dateFormat(details[0]);
-            Planes plane = new Planes(Integer.parseInt(details[1]), details[2], date);
+            Planes plane = new Planes(Integer.parseInt(details[1]), details[2], details[3], date);
             this.allPlanes.add(plane);
         }
     }
@@ -51,11 +51,11 @@ public class AirlineTicketing {
         }
     }
 
-    private void writePlane(String file, int maxSeats, String dest, String date) throws IllegalArgumentException { // writes down the inputted plane value to a text file (only accesible via addPlanes() method)
+    private void writePlane(String file, int maxSeats, String origin, String dest, String date) throws IllegalArgumentException { // writes down the inputted plane value to a text file (only accesible via addPlanes() method)
         try {
             FileWriter fr = new FileWriter(file, true);
             fr.write("\n");
-            String data = date + "/" + Integer.toString(maxSeats) + "/" + dest;
+            String data = date + "/" + Integer.toString(maxSeats) + "/" + origin + "/" + dest;
             fr.write(data);
             fr.close();
         } catch (Exception e) {
@@ -70,83 +70,84 @@ public class AirlineTicketing {
 
 //***************************************** Functional Methods *****************************************//
 
-    public void addPlane(int maxSeats, String dest, String date) {
+    public void addPlane(int maxSeats, String origin, String dest, String date) {
         Date d = this.dateFormat(date);
-        Planes p = new Planes(maxSeats, dest, d);
+        Planes p = new Planes(maxSeats, origin, dest, d);
         this.allPlanes.add(p);
-        this.writePlane("planes.txt", maxSeats, dest, date);
+        this.writePlane("planes.txt", maxSeats, origin, dest, date);
     }
 
-    public Planes searchPlane(String dest, Date date) {
+    public Planes searchPlane(String origin, String dest, Date date) {
         for (int i = 0; i < this.allPlanes.size(); i++) {
             Planes p = this.allPlanes.get(i);
-            if (p.date.compareTo(date) == 0 && p.dest.equals(dest)) { // found a matching plane
+            if (p.date.compareTo(date) == 0 && p.origin.equals(origin) && p.dest.equals(dest)) { // found a matching plane
                 return p;
             }
         }
-        System.out.println("No matching plane going to " + dest + " on " + date + "! Please try again.");
-        Planes dummy = new Planes(0, "invalid", this.dateFormat("00:00 Jan 1 0000"));
+        System.out.println("No matching plane going from " + origin + " to " + dest + " on " + date + "! Please try again.");
+        Planes dummy = new Planes(0, "invalid", "invalid", this.dateFormat("00:00 Jan 1 0000"));
         return dummy;
     }
 
-    public void bookSeat(String dest, String date) {
-        Planes p = this.searchPlane(dest, this.dateFormat(date));
+    public void bookSeat(String origin, String dest, String date) {
+        Planes p = this.searchPlane(origin, dest, this.dateFormat(date));
         if (p.dest == "invalid") {
             return;
         }
         else {
             if (p.addSeat()) {
-                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going to " + dest + " at " + date);
+                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going from " + origin + " to " + dest + " at " + date);
+                System.out.printf("Current/Max Seats: %d/%d\n", p.current, p.maxSeats);
             }
         }
     }
 
-    public void bookSeat(String dest, Date date) {
-        Planes p = this.searchPlane(dest, date);
+    public void bookSeat(String origin, String dest, Date date) {
+        Planes p = this.searchPlane(origin, dest, date);
         if (p.dest == "invalid") {
             return;
         }
         else {
             if (p.addSeat()) {
-                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going to " + dest + " at " + date);
+                System.out.println("Successfully booked a seat on Plane #" + p.planeNum + " going from " + origin + " to " + dest + " at " + date);
+                System.out.printf("Current/Max Seats: %d/%d\n", p.current, p.maxSeats);
             }
         }
     }
 
-    public void changeSeat(String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
-        Planes originPlane = this.searchPlane(dest, this.dateFormat(originDate));
-        Planes newPlane = this.searchPlane(dest, this.dateFormat(newDate));
+    public void changeSeat(String origin, String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
+        Planes originPlane = this.searchPlane(origin, dest, this.dateFormat(originDate));
+        Planes newPlane = this.searchPlane(origin, dest, this.dateFormat(newDate));
         if (newPlane.dest == "invalid") {
             return;
         }
         else {
             if (originPlane.removeSeat()) {
-                this.bookSeat(dest, newDate);
+                this.bookSeat(origin, dest, newDate);
             }
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { // tests
         // Scanner sc = new Scanner(System.in);
         // System.out.println("Please select from the following:");
         // System.out.println("Book a Ticket (1) / Change a Ticket (2)");
         // int s = sc.nextInt();
         // System.out.println("Selection: " + s);
 
-        AirlineTicketing a = new AirlineTicketing();
-        System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
-        a.bookSeat("Boston", "12:30 Apr 1 2022");
-        System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
+        // AirlineTicketing a = new AirlineTicketing();
+        // System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
+        // a.bookSeat("Concord", "Boston", "12:30 Apr 1 2022");
+        // System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
 
-        System.out.println(a.getPlanes());
-        a.bookSeat("New York", "12:30 Apr 1 2022");
-        System.out.println(a.getPlanes());
+        // System.out.println(a.getPlanes());
+        // a.bookSeat("Boston", "New York", "12:30 Apr 1 2022");
+        // System.out.println(a.getPlanes());
 
-        a.getPlanes().get(2).current = 50;
-        a.bookSeat("Boston", "12:30 Apr 1 2022");
+        // a.addPlane(50, "Boston", "New York", "01:30 Apr 3 2022");
 
-        System.out.println(a.getPlanes().get(0).planeNum);
-        System.out.println(a.getPlanes().get(1).planeNum);
-        System.out.println(a.getPlanes().get(2).planeNum);
+        // System.out.println(a.getPlanes().get(0).planeNum);
+        // System.out.println(a.getPlanes().get(1).planeNum);
+        // System.out.println(a.getPlanes().get(2).planeNum);
     }
 }
