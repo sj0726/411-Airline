@@ -89,12 +89,15 @@ public class User
             System.out.println("How can we help today?");
             String choice;
             while(true) {
-                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\"): ");
+                System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\") / View your flights (Type \"View\") : ");
                 choice = s.nextLine();
-                if (choice.equals("Book")) {
+                if (choice.equalsIgnoreCase("Book")) {
                     break;
                 }
                 else if (choice.equalsIgnoreCase("Change")) {
+                    break;
+                }
+                else if(choice.equalsIgnoreCase("View")){
                     break;
                 }
                 else {
@@ -126,7 +129,19 @@ public class User
                     }
                 }
             }
-            else { // seat change
+            if(choice.equalsIgnoreCase("Change")) { // seat change
+
+
+
+
+            }
+            if(choice.equalsIgnoreCase("View")) {
+                for(int i= 1; i< user.user_planes.size();i++){
+                    System.out.println(Arrays.toString(user.user_planes.get(i)));
+
+                }
+
+
 
             }
         }
@@ -168,16 +183,14 @@ public class User
 
             }
             if(valid&& password.length()>1){
-
-
-
                 loggedIn = true;
+
+                System.out.println("Logged in. Welcome, " + username + "!" );
                 UserAccount u = User.searchUser(new UserAccount("dummy", username, password));
                 if (u.name.equals("invalid")) {
                     System.out.println("Username/Password does not match!");
                 }
                 else {
-                    System.out.println("Logged in. Welcome, " + username + "!" );
                     menu(u);
                 }
 
