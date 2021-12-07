@@ -135,19 +135,19 @@ public class AirlineTicketing {
         // int s = sc.nextInt();
         // System.out.println("Selection: " + s);
 
-        AirlineTicketing a = new AirlineTicketing();
-        System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
-        a.bookSeat("Concord", "Boston", "12:30 Apr 1 2022");
-        System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
+        // AirlineTicketing a = new AirlineTicketing();
+        // System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
+        // a.bookSeat("Concord", "Boston", "12:30 Apr 1 2022");
+        // System.out.println(Arrays.toString(a.getPlanes().get(2).seats));
 
-        System.out.println(a.getPlanes());
-        a.bookSeat("Boston", "New York", "12:30 Apr 1 2022");
-        System.out.println(a.getPlanes());
+        // System.out.println(a.getPlanes());
+        // a.bookSeat("Boston", "New York", "12:30 Apr 1 2022");
+        // System.out.println(a.getPlanes());
 
         // a.addPlane(50, "Boston", "New York", "01:30 Apr 3 2022");
 
-        System.out.println(a.getPlanes().get(0).planeNum);
-        System.out.println(a.getPlanes().get(1).planeNum);
-        System.out.println(a.getPlanes().get(2).planeNum);
+        // System.out.println(a.getPlanes().get(0).planeNum);
+        // System.out.println(a.getPlanes().get(1).planeNum);
+        // System.out.println(a.getPlanes().get(2).planeNum);
     }
 }
