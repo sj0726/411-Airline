@@ -39,7 +39,7 @@ public class AirlineTicketing {
         }
     }
 
-    private Date dateFormat (String date) throws IllegalArgumentException { // formats incoming string as a valid Date object
+    public Date dateFormat (String date) throws IllegalArgumentException { // formats incoming string as a valid Date object
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm MMM dd yyyy", Locale.ENGLISH);
         Date d;
         try {
@@ -89,6 +89,28 @@ public class AirlineTicketing {
         return dummy;
     }
 
+    public Planes[] searchAllPlane(String origin, String dest) {
+        ArrayList<Planes> matching = new ArrayList<Planes>();
+        for (int i = 0; i < this.allPlanes.size(); i++) {
+            Planes p = this.allPlanes.get(i);
+            if (p.origin.equals(origin) && p.dest.equals(dest)) { // found plane(s) with matching origin & destination
+                matching.add(p);
+            }
+        }
+        if (matching.size() > 0) {
+            Planes[] result = new Planes[matching.size()];
+            for (int i = 0; i < matching.size(); i++) {
+                result[i] = matching.get(i);
+            }
+            return result;
+        }
+        else { // no matching planes
+            System.out.println("No matching plane going from " + origin + " to " + dest + "! Please try again.");
+            Planes[] dummy = new Planes[0];
+            return dummy;
+        }
+    }
+
     public void bookSeat(String origin, String dest, String date) {
         Planes p = this.searchPlane(origin, dest, this.dateFormat(date));
         if (p.dest == "invalid") {
@@ -115,16 +137,17 @@ public class AirlineTicketing {
         }
     }
 
-    public void changeSeat(String origin, String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
+    public boolean changeSeat(String origin, String dest, String originDate, String newDate) { // seat change can only happen on planes with identical destinations
         Planes originPlane = this.searchPlane(origin, dest, this.dateFormat(originDate));
         Planes newPlane = this.searchPlane(origin, dest, this.dateFormat(newDate));
         if (newPlane.dest == "invalid") {
-            return;
+            return false;
         }
         else {
-            if (originPlane.removeSeat()) {
-                this.bookSeat(origin, dest, newDate);
-            }
+            // if (originPlane.removeSeat()) {
+            this.bookSeat(origin, dest, newDate);
+            // }
+            return true;
         }
     }
 
