@@ -3,6 +3,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class User
@@ -51,8 +52,8 @@ public class User
         }
     }
 
-    private void addUser(String name, String username, String password) {
-        UserAccount new_user = new UserAccount(name,username,password);
+    private void addUser(String name, String username, String password, CardInfo user_card) {
+        UserAccount new_user = new UserAccount(name,username,password,user_card);
         accounts.add(new_user);
         try {
             UserAccount.storeUser(new_user);
@@ -84,6 +85,8 @@ public class User
 
 
     public static void menu(UserAccount user){
+
+
         if(loggedIn){//-------------------Page when logged in------------------------
             Scanner s = new Scanner(System.in);
             System.out.println("How can we help today?");
@@ -104,7 +107,7 @@ public class User
                     System.out.printf("Invalid input. (%s) Please try again.\n", choice);
                 }
             }
-            // start ticketing process.. but must differentiate per airport? or nah
+            // start ticketing process...
             AirlineTicketing ticketing = new AirlineTicketing();
             ArrayList<Planes> planeSchedule = ticketing.getPlanes();
             Planes p;
@@ -119,10 +122,23 @@ public class User
                     p = planeSchedule.get(planeNum);
                     System.out.print("\nSelected plane\n====================\n" + p + "====================\n\nPlease confirm the above is correct (y/n): ");
                     if (s.nextLine().equals("y")) {
-                        ticketing.bookSeat(p.origin, p.dest, p.date);
-                        User.addUserPlane(user, p);
-                        System.out.println(Arrays.toString(user.printUserPlanes()));
-                        break;
+                        if(user.card!=null) {
+                            int length = user.card.getCnumber().length();//confirmation to use user's card on file
+                            assert length>4;
+                            System.out.println("Confirm that you want to use this card *******" + user.getCardNum().substring(length - 4) + " to purchase this ticket? (y/n)");
+                            String confirm_card = s.nextLine();
+                            if (confirm_card.equalsIgnoreCase("y")) {
+                                ticketing.bookSeat(p.origin, p.dest, p.date);
+                                User.addUserPlane(user, p);
+                                System.out.println(Arrays.toString(user.printUserPlanes()));
+                                break;
+                            }
+                        }else {
+                            ticketing.bookSeat(p.origin, p.dest, p.date);
+                            User.addUserPlane(user, p);
+                            System.out.println(Arrays.toString(user.printUserPlanes()));
+                            break;
+                        }
                     }
                     else {
                         continue;
@@ -228,8 +244,8 @@ public class User
             String secCode = input.nextLine();
             CardInfo user_card = new CardInfo(cardName,cardNum,expDate,secCode);
             user_card.storeCard();
-            user.addUser(name,username,password);
-            UserAccount u = new UserAccount(name,username,password);
+            user.addUser(name,username,password,user_card);
+            UserAccount u = new UserAccount(name,username,password,user_card);
 
             loggedIn = true;
             menu(u);
@@ -247,10 +263,19 @@ class UserAccount
     public String username;
     public String password;
     public String name;
+    public CardInfo card;
     private boolean active;
     public ArrayList<String[]> user_planes;
 
 
+    public UserAccount(String name, String username, String password,CardInfo card_) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.active = true;
+        this.user_planes = new ArrayList<String[]>();
+        this.card = card_;
+    }
     public UserAccount(String name, String username, String password) {
         this.name = name;
         this.username = username;
@@ -354,6 +379,9 @@ class UserAccount
     }
     public String getPassword(){
         return this.password;
+    }
+    public String getCardNum(){
+        return this.card.getCnumber();
     }
 
 }
