@@ -1,3 +1,1 @@
-Ahmed/ahm/1234/true/15:30 Apr 01 2021/Boston/Providence,20:30 Apr 01 2021/Providence/Hartford,20:30 Apr 01 2021/Hartford/Concord
-nick/nick/nick/true/
-test/test/test/true/
+Ahmed/ahm/1234/true/09:30 Apr 01 2021/Boston/Providence,09:30 Apr 01 2021/Providence/Hartford,20:30 Apr 01 2021/Hartford/Concord,09:30 Apr 01 2021/Burlington/Portland,09:30 Apr 01 2021/Burlington/Portland

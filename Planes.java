@@ -1,4 +1,5 @@
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 // class for individual planes
 
@@ -12,15 +13,50 @@ public class Planes {
     String dest;
     Date date;
 
-    public Planes(int maxSeats, String origin, String dest, Date date) {
-        Planes.number++;
-        this.planeNum = Planes.number;
+    public Planes(int maxSeats, String origin, String dest, Date date) { // constructor using Date object for dates
+        if (maxSeats == -1) {
+            this.planeNum = -1;
+            this.seats = new boolean[0];
+        }
+        else {
+            Planes.number++;
+            this.planeNum = Planes.number;
+            this.seats = new boolean[maxSeats];
+        }
         this.maxSeats = maxSeats;
-        this.seats = new boolean[maxSeats];
         this.current = 0;
         this.origin = origin;
         this.dest = dest;
         this.date = date;
+    }
+
+    public Planes(int maxSeats, String origin, String dest, String date) { // constructor using String object for dates
+        if (maxSeats == -1) {
+            this.planeNum = -1;
+            this.seats = new boolean[0];
+        }
+        else {
+            Planes.number++;
+            this.planeNum = Planes.number;
+            this.seats = new boolean[maxSeats];
+        }
+        this.maxSeats = maxSeats;
+        this.current = 0;
+        this.origin = origin;
+        this.dest = dest;
+        this.date = this.dateFormat(date);
+    }
+
+    public Date dateFormat (String date) throws IllegalArgumentException { // formats incoming string as a valid Date object
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm MMM dd yyyy", Locale.ENGLISH);
+        Date d;
+        try {
+            d = formatter.parse(date);
+            return d;
+        } catch (Exception e) {
+            System.out.println("Wrong date format! (HH:mm MMM dd yyyy)");
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public String toString() {
@@ -28,7 +64,7 @@ public class Planes {
         return s;
     }
 
-    public boolean addSeat() {
+    public boolean addSeat() { // increments seat count "current" and corresponding seats index to true
         if (this.current < this.maxSeats) {
             this.seats[this.current] = true;
             this.current++;
@@ -40,7 +76,7 @@ public class Planes {
         }
     }
 
-    public boolean removeSeat() {
+    public boolean removeSeat() { // decrements seat count "current" and corresponding seats index to false
         if (this.current > 0) {
             this.current--;
             this.seats[this.current] = false;

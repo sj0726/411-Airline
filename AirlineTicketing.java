@@ -2,6 +2,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
+// class for set of planes
+
 public class AirlineTicketing {
     ArrayList<Planes> allPlanes = new ArrayList<>();
 
@@ -13,7 +15,7 @@ public class AirlineTicketing {
 
     private void readPlanes(String file) throws IllegalArgumentException { // reads a text file of planes with delimiter "/" to parse data and loads them to its allPlanes attribute
         String result = "";
-        try {
+        try { // file reading
             File p = new File(file);
             Scanner fileReader = new Scanner(p);
             while (fileReader.hasNextLine()) {
@@ -30,7 +32,7 @@ public class AirlineTicketing {
         String[] planes = result.split("\n");
 
         Date date;
-        for (int i = 0; i < planes.length; i++) {
+        for (int i = 0; i < planes.length; i++) { // data parsing by delimiter "/"
             String d = planes[i];
             String[] details = d.split("/");
             date = this.dateFormat(details[0]);
@@ -70,14 +72,14 @@ public class AirlineTicketing {
 
 //***************************************** Functional Methods *****************************************//
 
-    public void addPlane(int maxSeats, String origin, String dest, String date) {
+    public void addPlane(int maxSeats, String origin, String dest, String date) { // adds a plane to allPlanes arraylist
         Date d = this.dateFormat(date);
         Planes p = new Planes(maxSeats, origin, dest, d);
         this.allPlanes.add(p);
         this.writePlane("planes.txt", maxSeats, origin, dest, date);
     }
 
-    public Planes searchPlane(String origin, String dest, Date date) {
+    public Planes searchPlane(String origin, String dest, Date date) { // search for a matching plane with the same origin, destination, and date
         for (int i = 0; i < this.allPlanes.size(); i++) {
             Planes p = this.allPlanes.get(i);
             if (p.date.compareTo(date) == 0 && p.origin.equals(origin) && p.dest.equals(dest)) { // found a matching plane
@@ -85,11 +87,11 @@ public class AirlineTicketing {
             }
         }
         System.out.println("No matching plane going from " + origin + " to " + dest + " on " + date + "! Please try again.");
-        Planes dummy = new Planes(0, "invalid", "invalid", this.dateFormat("00:00 Jan 1 0000"));
+        Planes dummy = new Planes(-1, "invalid", "invalid", this.dateFormat("00:00 Jan 1 0000")); // return dummy plane
         return dummy;
     }
 
-    public Planes[] searchAllPlane(String origin, String dest) {
+    public Planes[] searchAllPlane(String origin, String dest) { // search for all planees with matching origin/destination (does not consider date)
         ArrayList<Planes> matching = new ArrayList<Planes>();
         for (int i = 0; i < this.allPlanes.size(); i++) {
             Planes p = this.allPlanes.get(i);
@@ -111,7 +113,7 @@ public class AirlineTicketing {
         }
     }
 
-    public void bookSeat(String origin, String dest, String date) {
+    public void bookSeat(String origin, String dest, String date) { // book a seat on a chosen plane (String date)
         Planes p = this.searchPlane(origin, dest, this.dateFormat(date));
         if (p.dest == "invalid") {
             return;
@@ -124,7 +126,7 @@ public class AirlineTicketing {
         }
     }
 
-    public void bookSeat(String origin, String dest, Date date) {
+    public void bookSeat(String origin, String dest, Date date) { // book a seat on a chosen plane (Date date)
         Planes p = this.searchPlane(origin, dest, date);
         if (p.dest == "invalid") {
             return;
@@ -144,9 +146,9 @@ public class AirlineTicketing {
             return false;
         }
         else {
-            // if (originPlane.removeSeat()) {
+            if (originPlane.removeSeat()) { // remove the seat first, and then book it for the new plane
             this.bookSeat(origin, dest, newDate);
-            // }
+            }
             return true;
         }
     }

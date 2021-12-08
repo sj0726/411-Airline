@@ -3,19 +3,21 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+// class for set of user accounts
+
 public class User
 {
-    private static boolean loggedIn;
-    public static ArrayList<UserAccount> accounts = new ArrayList<>();
+    private static boolean loggedIn; // checks log-in status
+    public static ArrayList<UserAccount> accounts = new ArrayList<>(); // arraylist of user accounts for storing all user's data (global to keep track of all instances)
 
-    public User() {
+    public User() { // initializes by reading user's data from "user_info.txt"
         this.readUsers();
     }
 
     private void readUsers() throws IllegalArgumentException{
         String result = "";
         String file = "user_info.txt";
-        try {
+        try { // file reading
             File p = new File(file);
             Scanner fileReader = new Scanner(p);
             while (fileReader.hasNextLine()) {
@@ -31,7 +33,7 @@ public class User
         }
         UserAccount user;
         String[] users = result.split("\n");
-        for (int i = 0; i < users.length; i++) {
+        for (int i = 0; i < users.length; i++) { // parsing data for each line of data (a line represents a user's data)
             String[] data = users[i].split("/", 5);
             String[] planes = data[4].split(",");
             if (planes.length > 0) { // user has a list of purchased tickets, use modified constructor consisting of planes ArrayList
@@ -45,11 +47,11 @@ public class User
             else { // user has no plane tickets, use default constructor without ArrayList of planes
                 user = new UserAccount(data[0], data[1], data[2]); // name, username, password, user_planes
             }
-            User.accounts.add(user);
+            User.accounts.add(user); // add user to accounts global variable
         }
     }
 
-    private void addUser(String name, String username, String password) {
+    private void addUser(String name, String username, String password) { // add user to accounts global variable
             UserAccount new_user = new UserAccount(name,username,password);
             accounts.add(new_user);
             try {
@@ -59,7 +61,7 @@ public class User
             }
     }
 
-    public static UserAccount searchUser(UserAccount user) {
+    public static UserAccount searchUser(UserAccount user) { // search for user with same username & password
         for (int i = 0; i < accounts.size(); i++) {
             if (accounts.get(i).username.equals(user.username) && accounts.get(i).password.equals(user.password)) { // if there exists a matching username & password
                 return accounts.get(i);
@@ -95,26 +97,34 @@ public class User
             Scanner s = new Scanner(System.in);
             System.out.println("How can we help today?");
             String choice;
-            while(true) {
+            AirlineTicketing ticketing = new AirlineTicketing();
+            int size = ticketing.getPlanes().size();
+            for (int i = 0; i < User.accounts.size(); i++) { // keeps track of seats users have booked for
+                UserAccount u = User.accounts.get(i);
+                Planes p = u.planesList.get(i);
+                Planes result = ticketing.searchPlane(p.origin, p.dest, p.date);
+                result.seats[result.current] = true;
+                result.current++;
+            }
+            while(true) { // user interaction page
                 System.out.printf("\nPlease select from the following: \n");
                 System.out.print("Book a ticket (Type \"Book\") / Change a seat (Type \"Change\") / View your flights (Type \"View\") / Exit (Type \"Exit\"): ");
                 choice = s.nextLine();
-                AirlineTicketing ticketing = new AirlineTicketing();
                 ArrayList<Planes> planeSchedule = ticketing.getPlanes();
                 Planes p;
-                if (choice.equalsIgnoreCase("Book")) {
+                if (choice.equalsIgnoreCase("Book")) { // choose booking
                     while (true) {
                         System.out.println("Please choose from the following planes:");
                         for (int i = 0; i < planeSchedule.size(); i++) {
-                            System.out.println(planeSchedule.get(i));
+                            System.out.println(planeSchedule.get(i)); // print out available planes
                         }
                         System.out.print("Plane #?: ");
                         int planeNum = Integer.parseInt(s.nextLine()) - 1;
                         p = planeSchedule.get(planeNum);
                         System.out.print("\nSelected plane\n====================\n" + p + "====================\n\nPlease confirm the above is correct (y/n): ");
                         if (s.nextLine().equals("y")) {
-                            ticketing.bookSeat(p.origin, p.dest, p.date);
-                            User.modifyUserPlane(user, p);
+                            ticketing.bookSeat(p.origin, p.dest, p.date); // books a seat on the chosen plane
+                            User.modifyUserPlane(user, p); // modifies user account such that the data is updated on "user_info.txt"
                             user.printUserPlanes();
                             break;
                         }
@@ -123,14 +133,14 @@ public class User
                         }
                     }
                 }
-                else if (choice.equalsIgnoreCase("Change")) {
+                else if (choice.equalsIgnoreCase("Change")) { // choose seat change
                     System.out.println("Please choose the plane ticket you'd like to change seats for: ");
                     user.printUserPlanes();
                     System.out.print("Ticket #: ");
                     int ticket = s.nextInt() - 1;
                     String[] data = user.user_planes.get(ticket);
-                    Planes[] matching = ticketing.searchAllPlane(data[1], data[2]);
-                    Planes[] planesToChange = new Planes[matching.length -1]; // contains all matching planes except the one identical
+                    Planes[] matching = ticketing.searchAllPlane(data[1], data[2]); // looks for all planes with matching origin and destination
+                    Planes[] planesToChange = new Planes[matching.length -1]; // contains all matching planes except the one identical to it
                     Planes identical = ticketing.searchPlane(data[1], data[2], ticketing.dateFormat(data[0]));
                     int count = 0;
                     System.out.println("\n----------------------------------------------------------------------\n");
@@ -150,9 +160,9 @@ public class User
                     DateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd yyyy");
                     for (int i = 0; i < planesToChange.length; i++) {
                         if (matching[i].planeNum == planeNum) {
-                            boolean check = ticketing.changeSeat(identical.origin, identical.dest, dateFormat.format(identical.date), dateFormat.format(matching[i].date));
+                            boolean check = ticketing.changeSeat(identical.origin, identical.dest, dateFormat.format(identical.date), dateFormat.format(matching[i].date)); // update seats for original & new planes
                             if (check) {
-                                User.updateUserPlane(user, identical, matching[i]);
+                                User.updateUserPlane(user, identical, matching[i]); // updates user's data accordingly
                             }
                             else {
                                 System.out.println("Failed to change seats!");
@@ -160,7 +170,6 @@ public class User
                             break;
                         }
                     }
-                    break;
                 }
                 else if(choice.equalsIgnoreCase("View")){
                     user.printUserPlanes();
@@ -176,9 +185,8 @@ public class User
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        User user = new User();
-
+    public static void main(String[] args) throws IOException { // main function for initializing methods & variables for running the program
+        User user = new User(); // initiates global accounts variable
 
         Scanner input = new Scanner (System.in);
         Scanner input2 = new Scanner(System.in);
@@ -190,7 +198,7 @@ public class User
 
         boolean wants_to_register = false;
 
-
+        // below are the login prompts
         System.out.println("Welcome to New England Express Airlines!");
         System.out.print("Login or Register?(type 'Login' or 'Register): ");
         choice = input.nextLine();
@@ -200,7 +208,7 @@ public class User
             username = input.nextLine();
             System.out.print("Password: ");
             password = input.nextLine();
-            UserAccount u = User.searchUser(new UserAccount("dummy", username, password));
+            UserAccount u = User.searchUser(new UserAccount("dummy", username, password)); // checks to make sure credentials are on file ("user_info.txt")
             if (u.name.equals("invalid")) {
                 System.out.println("This account information is not on file. Do you want to create an account? (Type Yes/No)");
                 String create_acc = input2.nextLine();
@@ -214,7 +222,7 @@ public class User
             else {
                 System.out.println("Logged in. Welcome, " + u.name + "!" );
                 loggedIn = true;
-                menu(u);
+                menu(u); // initiates user interaction
             }
         }
         if(choice.equalsIgnoreCase("Register")||wants_to_register) {
@@ -243,7 +251,7 @@ public class User
             UserAccount u = new UserAccount(name,username,password);
 
             loggedIn = true;
-            menu(u);
+            menu(u); // initiates user interaction
 
         }
 
@@ -251,6 +259,7 @@ public class User
 
 }
 
+// class for individual user accounts
 
 class UserAccount
 {
@@ -260,35 +269,48 @@ class UserAccount
     public String name;
     private boolean active;
     public ArrayList<String[]> user_planes;
+    public ArrayList<Planes> planesList;
+    public DateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd yyyy");
 
 
-    public UserAccount(String name, String username, String password) {
+    public UserAccount(String name, String username, String password) { // constructor when the user has not purchased any tickets
         this.name = name;
         this.username = username;
         this.password = password;
         this.active = true;
         this.user_planes = new ArrayList<String[]>();
+        this.planesList = new ArrayList<Planes>();
     }
 
-    public UserAccount(String name, String username, String password, ArrayList<String[]> user_planes) {
+    public UserAccount(String name, String username, String password, ArrayList<String[]> user_planes) { // constructor when user has purchased some tickets and is recorded on "user_info.txt"
         this.name = name;
         this.username = username;
         this.password = password;
         this.active = true;
         this.user_planes = user_planes;
+        this.planesList = new ArrayList<Planes>();
+        for (int i = 0; i < user_planes.size(); i++) { // create dummy planes based on user's data on the file (this.user_planes) to allow searching
+            String[] p = user_planes.get(i);
+            Planes plane = new Planes(-1, p[1], p[2], p[0]);
+            this.planesList.add(plane);
+        }
     }
 
-    public void modifyUser_planes(Planes p){
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd yyyy");
-        String[] plane = {dateFormat.format(p.date), p.origin, p.dest};
+    public void modifyUser_planes(Planes p){ // wrapper for adding a plane to user's data
+        String[] plane = {this.dateFormat.format(p.date), p.origin, p.dest};
         this.user_planes.add(plane);
         updateUser_planes(this, plane);
     }
 
-    public void modifyUser_planes(Planes original, Planes changed){
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd yyyy");
-        String[] plane = {dateFormat.format(original.date), dateFormat.format(changed.date), changed.origin, changed.dest};
-        this.user_planes.add(plane);
+    public void modifyUser_planes(Planes original, Planes changed){ // wrapper for updating user's planes data for seat changes
+        String[] plane = {this.dateFormat.format(original.date), this.dateFormat.format(changed.date), changed.origin, changed.dest};
+        String[] updated = {this.dateFormat.format(changed.date), changed.origin, changed.dest};
+        for (int i = 0; i < this.user_planes.size(); i++) {
+            String[] current = this.user_planes.get(i);
+            if (current[0].equals(plane[0]) && current[1].equals(plane[2]) && current[2].equals(plane[3])) {
+                this.user_planes.set(i, updated);
+            }
+        }
         updateUser_planes(this, plane);
     }
 
@@ -303,7 +325,7 @@ class UserAccount
         System.out.println("=======================");
     }
 
-    private static void updateUser_planes(UserAccount user, String[] plane) {
+    private static void updateUser_planes(UserAccount user, String[] plane) { // reads the "user_info.txt" and either adds a new plane data to the end or updates the dates on the existing one
         File file = new File("user_info.txt");
         FileWriter writer = null;
         String result = "";
@@ -319,10 +341,13 @@ class UserAccount
                         for (int i = 0; i < p.length; i++) {
                             String[] schedule = p[i].split("/");
                             if (schedule[0].equals(plane[0]) && schedule[1].equals(plane[2]) && schedule[2].equals(plane[3])) { // if it has a matching date, origin & dest as the original
-                                result += plane[1] + "/" + plane[2] + "/" + plane[3] + ",";
+                                result += plane[1] + "/" + plane[2] + "/" + plane[3];
                             }
                             else { // not a matching plane scheudle, move on
-                                result += p[i] + ",";
+                                result += p[i];
+                            }
+                            if (i < p.length -1) {
+                                result += ",";
                             }
                         }
                     }
@@ -348,7 +373,7 @@ class UserAccount
     }
 
 
-    public static void storeUser(UserAccount user) throws IOException{
+    public static void storeUser(UserAccount user) throws IOException{ // store user based on input from registration in "user_info.txt"
         FileWriter fw = null;
         BufferedWriter bw = null;
         PrintWriter pw = null;
